@@ -5,6 +5,7 @@ import type { CardInstance } from "@/engine/types";
 import { getCardDef } from "@/data/cards";
 import { useI18n } from "@/i18n/context";
 import { CardView } from "./CardView";
+import { CardDetailModal } from "./CardDetailModal";
 
 interface SetupModalProps {
   hand: CardInstance[];
@@ -15,6 +16,7 @@ interface SetupModalProps {
 export function SetupModal({ hand, firstPlayer, onChooseActive }: SetupModalProps) {
   const { t, locale } = useI18n();
   const [selectedUid, setSelectedUid] = useState<string | null>(null);
+  const [previewCard, setPreviewCard] = useState<CardInstance | null>(null);
 
   const creatures = hand.filter((c) => getCardDef(c.defId).kind === "creature");
 
@@ -32,6 +34,7 @@ export function SetupModal({ hand, firstPlayer, onChooseActive }: SetupModalProp
       <div className="w-full max-w-sm rounded-2xl border-4 border-[#d8dce6] bg-[#f1f2fc] p-5 text-center text-[#1f2a44] shadow-2xl">
         <h2 className="text-xl font-bold">{t("chooseActive")}</h2>
         <p className="mt-1 text-sm font-semibold text-slate-700">{t("chooseActivePrompt")}</p>
+        <p className="mt-0.5 text-[11px] text-cyan-800 font-medium">💡 {t("doubleTapHint")}</p>
 
         <div className="my-2 rounded-lg bg-white/70 py-1.5 text-xs font-bold text-slate-800">
           {firstPlayer === 0
@@ -51,13 +54,14 @@ export function SetupModal({ hand, firstPlayer, onChooseActive }: SetupModalProp
               <div
                 key={c.uid}
                 data-setup-creature={isCreature ? "true" : undefined}
-                className={`transition-opacity ${!isCreature ? "opacity-40 pointer-events-none" : ""}`}
+                className={`transition-opacity ${!isCreature ? "opacity-50" : ""}`}
               >
                 <CardView
                   card={c}
                   size="sm"
                   isSelected={selectedUid === c.uid}
                   onClick={() => handleSelect(c.uid)}
+                  onDoubleTap={(card) => setPreviewCard(card)}
                 />
               </div>
             );
@@ -71,6 +75,13 @@ export function SetupModal({ hand, firstPlayer, onChooseActive }: SetupModalProp
         >
           {locale === "id" ? "Mulai Pertarungan" : "Start Battle"}
         </button>
+
+        {previewCard && (
+          <CardDetailModal
+            card={previewCard}
+            onClose={() => setPreviewCard(null)}
+          />
+        )}
       </div>
     </div>
   );
