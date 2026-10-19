@@ -47,3 +47,5 @@ test_*.py
 *.py
 __pycache__/
 .pytest_cache/
+CardTesto/
+
