@@ -29,8 +29,7 @@ export function ActionBand({
   return (
     <nav className="band">
       <button
-        className={`btn ${isRetreatMode ? "go" : ""}`}
-        disabled={!canRetreat && !isRetreatMode}
+        className={`btn ${isRetreatMode ? "go" : ""} ${!canRetreat && !isRetreatMode ? "opacity-60" : ""}`}
         onClick={onRetreatClick}
         aria-label={`${t("retreat")} (${retreatCost})`}
       >
@@ -38,8 +37,7 @@ export function ActionBand({
       </button>
 
       <button
-        className="btn dark"
-        disabled={!canAttack}
+        className={`btn dark ${canAttack ? "go border-cyan-400" : "opacity-60"}`}
         onClick={onAttackClick}
         aria-label={t("attack")}
       >
@@ -47,8 +45,7 @@ export function ActionBand({
       </button>
 
       <button
-        className="btn go"
-        disabled={!canEndTurn}
+        className={`btn ${canEndTurn ? "go" : "opacity-60"}`}
         onClick={onEndTurnClick}
         aria-label={t("end")}
       >
