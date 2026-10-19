@@ -8,9 +8,17 @@ interface HandViewProps {
   cards: CardInstance[];
   selectedCardUid: string | null;
   onSelectCard: (uid: string) => void;
+  onHoverStart?: (card: CardInstance) => void;
+  onHoverEnd?: () => void;
 }
 
-export function HandView({ cards, selectedCardUid, onSelectCard }: HandViewProps) {
+export function HandView({
+  cards,
+  selectedCardUid,
+  onSelectCard,
+  onHoverStart,
+  onHoverEnd
+}: HandViewProps) {
   const count = cards.length;
 
   return (
@@ -27,6 +35,8 @@ export function HandView({ cards, selectedCardUid, onSelectCard }: HandViewProps
             size="xs"
             isSelected={selectedCardUid === c.uid}
             onClick={() => onSelectCard(c.uid)}
+            onHoverStart={onHoverStart}
+            onHoverEnd={onHoverEnd}
             style={
               {
                 "--r": `${rot}deg`,

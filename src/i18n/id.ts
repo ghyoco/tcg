@@ -42,7 +42,24 @@ export const id = {
     "5. Gunakan kartu barang untuk bantuan taktik (dapat digunakan berulang tanpa batas).",
     "6. Serang lawan jika energi mencukupi. Menyerang akan mengakhiri giliranmu.",
     "7. Ketuk karakter di arena untuk bertukar posisi atau memajukan cadangan saat gugur."
-  ]
+  ],
+  ability: "Kemampuan",
+  effect: "Efek",
+  weakness: "Kelemahan",
+  advantage: "Keunggulan",
+  close: "Tutup",
+  inspectHint: "Arahkan kursor menjauh atau klik di luar untuk menutup",
+  energyAttached: "Energi Terpasang",
+  attacksTitle: "Daftar Serangan",
+  itemRuleHint: "Kartu barang dapat digunakan berkali-kali tanpa batas per giliran.",
+  thickHideDesc: "Mengurangi setiap luka serangan yang diterima sebesar 10 HP.",
+  alarmDesc: "Memberikan sinyal waspada saat memasuki arena aktif.",
+  healActiveDesc: "Memulihkan 30 HP pada kartu aktif seketika.",
+  drawCardsDesc: "Mengambil 2 kartu tambahan dari dek ke tangan.",
+  energyBoostDesc: "Menambahkan 1 energi langsung ke kartu aktif seketika.",
+  fireAdvantageDesc: "Api menghasilkan 2x luka terhadap elemen Kegelapan.",
+  darkWeaknessDesc: "Rentan: Menerima 2x luka dari serangan elemen Api.",
+  lightNormalDesc: "Menghasilkan dan menerima luka normal (1x)."
 };
 
 export type TranslationKey = keyof typeof id;

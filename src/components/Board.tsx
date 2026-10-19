@@ -15,6 +15,8 @@ import { SetupModal } from "./SetupModal";
 import { AttackModal } from "./AttackModal";
 import { ResultModal } from "./ResultModal";
 import { MenuModal } from "./MenuModal";
+import { CardDetailModal } from "./CardDetailModal";
+import type { CardInstance } from "@/engine/types";
 
 interface AnimationState {
   attackerSlot: "player" | "bot" | null;
@@ -33,6 +35,7 @@ export function Board() {
   const [showAttackModal, setShowAttackModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [inspectedCard, setInspectedCard] = useState<CardInstance | null>(null);
 
   const [anim, setAnim] = useState<AnimationState>({
     attackerSlot: null,
@@ -44,6 +47,26 @@ export function Board() {
   stateRef.current = state;
   const botBusyRef = useRef(false);
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const currentHoveredUidRef = useRef<string | null>(null);
+
+  const handleCardHoverStart = (card: CardInstance) => {
+    if (state.phase === "setup") return;
+    if (currentHoveredUidRef.current === card.uid && hoverTimerRef.current) return;
+    currentHoveredUidRef.current = card.uid;
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => {
+      setInspectedCard(card);
+    }, 450);
+  };
+
+  const handleCardHoverEnd = () => {
+    currentHoveredUidRef.current = null;
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  };
 
   const player = state.players[0];
   const bot = state.players[1];
@@ -103,6 +126,8 @@ export function Board() {
   };
 
   const handleAction = (action: GameAction) => {
+    handleCardHoverEnd();
+    setInspectedCard(null);
     if (action.type === "ATTACK") {
       triggerAttackAnimation("player");
       setTimeout(() => dispatch(action), 400);
@@ -118,6 +143,8 @@ export function Board() {
   };
 
   const handleSetupActive = (cardUid: string) => {
+    handleCardHoverEnd();
+    setInspectedCard(null);
     dispatch({ type: "SETUP_CHOOSE_ACTIVE", playerIndex: 0, cardUid });
     const botAction = pickBotSetupActive(stateRef.current);
     if (botAction) {
@@ -355,7 +382,13 @@ export function Board() {
             <div className="mid">
               {bot.bench.map((card, i) =>
                 card ? (
-                  <CardView key={card.uid} card={card} size="sm" />
+                  <CardView
+                    key={card.uid}
+                    card={card}
+                    size="sm"
+                    onHoverStart={handleCardHoverStart}
+                    onHoverEnd={handleCardHoverEnd}
+                  />
                 ) : (
                   <div key={i} className="slot" />
                 )
@@ -377,6 +410,8 @@ export function Board() {
                 animClass={`${anim.attackerSlot === "bot" ? "anim-lunge-down" : ""} ${
                   anim.hitSlot === "bot" ? "anim-hit" : ""
                 } ${anim.switchSlot === "bot" ? "anim-switch" : ""}`}
+                onHoverStart={handleCardHoverStart}
+                onHoverEnd={handleCardHoverEnd}
               />
             ) : (
               <div className="slot lg" />
@@ -455,6 +490,8 @@ export function Board() {
                   anim.hitSlot === "player" ? "anim-hit" : ""
                 } ${anim.switchSlot === "player" ? "anim-switch" : ""}`}
                 onClick={handleActiveClick}
+                onHoverStart={handleCardHoverStart}
+                onHoverEnd={handleCardHoverEnd}
               />
             ) : (
               <div
@@ -487,6 +524,8 @@ export function Board() {
                       (state.phase === "promote" && state.pendingPromotePlayer === 0)
                     }
                     onClick={() => handleBenchSlotClick(i)}
+                    onHoverStart={handleCardHoverStart}
+                    onHoverEnd={handleCardHoverEnd}
                   />
                 ) : (
                   <div
@@ -517,6 +556,8 @@ export function Board() {
               cards={player.hand}
               selectedCardUid={selectedHandUid}
               onSelectCard={handleHandSelect}
+              onHoverStart={handleCardHoverStart}
+              onHoverEnd={handleCardHoverEnd}
             />
             <button
               className="menu"
@@ -559,6 +600,13 @@ export function Board() {
             logs={state.log}
             onRestart={() => window.location.reload()}
             onClose={() => setShowMenu(false)}
+          />
+        )}
+
+        {inspectedCard && (
+          <CardDetailModal
+            card={inspectedCard}
+            onClose={() => setInspectedCard(null)}
           />
         )}
       </main>

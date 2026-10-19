@@ -44,5 +44,22 @@ export const en: typeof id = {
     "5. Use item cards freely for tactical aid (multiple allowed per turn).",
     "6. Attack when you have enough attached energy. Attacking ends your turn.",
     "7. Tap characters on the board to switch positions or promote when knocked out."
-  ]
+  ],
+  ability: "Ability",
+  effect: "Effect",
+  weakness: "Weakness",
+  advantage: "Advantage",
+  close: "Close",
+  inspectHint: "Move cursor away or tap outside to close",
+  energyAttached: "Attached Energy",
+  attacksTitle: "Attacks",
+  itemRuleHint: "Item cards can be used without turn limits.",
+  thickHideDesc: "Reduces all incoming attack damage by 10 HP.",
+  alarmDesc: "Alerts allies when entering the active spot.",
+  healActiveDesc: "Instantly restores 30 HP to your active creature.",
+  drawCardsDesc: "Draws 2 additional cards from deck to hand.",
+  energyBoostDesc: "Attaches 1 bonus energy directly to active creature.",
+  fireAdvantageDesc: "Fire deals 2x damage against Dark elements.",
+  darkWeaknessDesc: "Vulnerable: Takes 2x damage from Fire element attacks.",
+  lightNormalDesc: "Deals and takes standard damage (1x)."
 };

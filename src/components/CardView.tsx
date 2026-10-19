@@ -12,6 +12,8 @@ interface CardViewProps {
   isHighlighted?: boolean;
   animClass?: string;
   onClick?: () => void;
+  onHoverStart?: (card: CardInstance) => void;
+  onHoverEnd?: () => void;
   style?: React.CSSProperties;
 }
 
@@ -22,6 +24,8 @@ export function CardView({
   isHighlighted = false,
   animClass = "",
   onClick,
+  onHoverStart,
+  onHoverEnd,
   style
 }: CardViewProps) {
   const { locale, t } = useI18n();
@@ -41,13 +45,22 @@ export function CardView({
       className={`card ${size} ${isSelected ? "selected" : ""} ${isHighlighted ? "highlighted" : ""} ${animClass}`}
       data-el={element}
       style={style}
-      onClick={onClick}
+      onClick={() => {
+        onHoverEnd?.();
+        onClick?.();
+      }}
+      onMouseMove={() => onHoverStart?.(card)}
+      onMouseLeave={() => onHoverEnd?.()}
+      onTouchStart={() => onHoverStart?.(card)}
+      onTouchEnd={() => onHoverEnd?.()}
+      onTouchCancel={() => onHoverEnd?.()}
       role="button"
       tabIndex={0}
       aria-label={`${name}, ${isCreature ? `${currentHp}/${maxHp} HP` : t("item")}`}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
+          onHoverEnd?.();
           onClick?.();
         }
       }}
