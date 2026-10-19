@@ -47,25 +47,9 @@ export function Board() {
   stateRef.current = state;
   const botBusyRef = useRef(false);
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const currentHoveredUidRef = useRef<string | null>(null);
 
-  const handleCardHoverStart = (card: CardInstance) => {
-    if (state.phase === "setup") return;
-    if (currentHoveredUidRef.current === card.uid && hoverTimerRef.current) return;
-    currentHoveredUidRef.current = card.uid;
-    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-    hoverTimerRef.current = setTimeout(() => {
-      setInspectedCard(card);
-    }, 450);
-  };
-
-  const handleCardHoverEnd = () => {
-    currentHoveredUidRef.current = null;
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current);
-      hoverTimerRef.current = null;
-    }
+  const handleDoubleTap = (card: CardInstance) => {
+    setInspectedCard(card);
   };
 
   const player = state.players[0];
@@ -126,7 +110,6 @@ export function Board() {
   };
 
   const handleAction = (action: GameAction) => {
-    handleCardHoverEnd();
     setInspectedCard(null);
     if (action.type === "ATTACK") {
       triggerAttackAnimation("player");
@@ -143,7 +126,6 @@ export function Board() {
   };
 
   const handleSetupActive = (cardUid: string) => {
-    handleCardHoverEnd();
     setInspectedCard(null);
     dispatch({ type: "SETUP_CHOOSE_ACTIVE", playerIndex: 0, cardUid });
     const botAction = pickBotSetupActive(stateRef.current);
@@ -386,8 +368,7 @@ export function Board() {
                     key={card.uid}
                     card={card}
                     size="sm"
-                    onHoverStart={handleCardHoverStart}
-                    onHoverEnd={handleCardHoverEnd}
+                    onDoubleTap={handleDoubleTap}
                   />
                 ) : (
                   <div key={i} className="slot" />
@@ -410,8 +391,7 @@ export function Board() {
                 animClass={`${anim.attackerSlot === "bot" ? "anim-lunge-down" : ""} ${
                   anim.hitSlot === "bot" ? "anim-hit" : ""
                 } ${anim.switchSlot === "bot" ? "anim-switch" : ""}`}
-                onHoverStart={handleCardHoverStart}
-                onHoverEnd={handleCardHoverEnd}
+                onDoubleTap={handleDoubleTap}
               />
             ) : (
               <div className="slot lg" />
@@ -490,8 +470,7 @@ export function Board() {
                   anim.hitSlot === "player" ? "anim-hit" : ""
                 } ${anim.switchSlot === "player" ? "anim-switch" : ""}`}
                 onClick={handleActiveClick}
-                onHoverStart={handleCardHoverStart}
-                onHoverEnd={handleCardHoverEnd}
+                onDoubleTap={handleDoubleTap}
               />
             ) : (
               <div
@@ -524,8 +503,7 @@ export function Board() {
                       (state.phase === "promote" && state.pendingPromotePlayer === 0)
                     }
                     onClick={() => handleBenchSlotClick(i)}
-                    onHoverStart={handleCardHoverStart}
-                    onHoverEnd={handleCardHoverEnd}
+                    onDoubleTap={handleDoubleTap}
                   />
                 ) : (
                   <div
@@ -556,8 +534,7 @@ export function Board() {
               cards={player.hand}
               selectedCardUid={selectedHandUid}
               onSelectCard={handleHandSelect}
-              onHoverStart={handleCardHoverStart}
-              onHoverEnd={handleCardHoverEnd}
+              onDoubleTap={handleDoubleTap}
             />
             <button
               className="menu"

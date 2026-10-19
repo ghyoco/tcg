@@ -42,7 +42,6 @@ export function CardDetailModal({ card, onClose }: CardDetailModalProps) {
       <div
         className="relative w-full max-w-xs sm:max-w-sm rounded-2xl border-4 border-[#3a4768] bg-[#1a233a] p-4 text-white shadow-2xl flex flex-col gap-3 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
-        onMouseLeave={onClose}
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-700 pb-2">

@@ -12,8 +12,7 @@ interface CardViewProps {
   isHighlighted?: boolean;
   animClass?: string;
   onClick?: () => void;
-  onHoverStart?: (card: CardInstance) => void;
-  onHoverEnd?: () => void;
+  onDoubleTap?: (card: CardInstance) => void;
   style?: React.CSSProperties;
 }
 
@@ -24,11 +23,47 @@ export function CardView({
   isHighlighted = false,
   animClass = "",
   onClick,
-  onHoverStart,
-  onHoverEnd,
+  onDoubleTap,
   style
 }: CardViewProps) {
   const { locale, t } = useI18n();
+  const clickTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const lastTapTimeRef = React.useRef<number>(0);
+
+  React.useEffect(() => {
+    return () => {
+      if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+    };
+  }, []);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!onDoubleTap) {
+      onClick?.();
+      return;
+    }
+
+    const now = Date.now();
+    const isDouble = now - lastTapTimeRef.current < 300 || e.detail === 2;
+
+    if (isDouble) {
+      if (clickTimerRef.current) {
+        clearTimeout(clickTimerRef.current);
+        clickTimerRef.current = null;
+      }
+      lastTapTimeRef.current = 0;
+      onDoubleTap(card);
+    } else {
+      lastTapTimeRef.current = now;
+      if (onClick) {
+        if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+        clickTimerRef.current = setTimeout(() => {
+          onClick();
+          clickTimerRef.current = null;
+        }, 250);
+      }
+    }
+  };
+
   const def = getCardDef(card.defId);
   const isCreature = def.kind === "creature";
   const cDef = isCreature ? (def as CreatureDef) : null;
@@ -45,23 +80,25 @@ export function CardView({
       className={`card ${size} ${isSelected ? "selected" : ""} ${isHighlighted ? "highlighted" : ""} ${animClass}`}
       data-el={element}
       style={style}
-      onClick={() => {
-        onHoverEnd?.();
-        onClick?.();
+      onClick={handleClick}
+      onDoubleClick={(e) => {
+        e.preventDefault();
+        if (clickTimerRef.current) {
+          clearTimeout(clickTimerRef.current);
+          clickTimerRef.current = null;
+        }
+        onDoubleTap?.(card);
       }}
-      onMouseMove={() => onHoverStart?.(card)}
-      onMouseLeave={() => onHoverEnd?.()}
-      onTouchStart={() => onHoverStart?.(card)}
-      onTouchEnd={() => onHoverEnd?.()}
-      onTouchCancel={() => onHoverEnd?.()}
       role="button"
       tabIndex={0}
       aria-label={`${name}, ${isCreature ? `${currentHp}/${maxHp} HP` : t("item")}`}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          onHoverEnd?.();
           onClick?.();
+        } else if (e.key === "i" || e.key === "I") {
+          e.preventDefault();
+          onDoubleTap?.(card);
         }
       }}
     >
