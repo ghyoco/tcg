@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI creation and agent artifacts
+.agents/
+AGENTS.md
+test_*.py
+*.py
+__pycache__/
+.pytest_cache/
